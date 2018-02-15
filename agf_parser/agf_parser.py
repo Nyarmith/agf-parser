@@ -43,7 +43,6 @@ class adventureGame:
     def isWin(self):
         return self.pos in self.data['states']['win_states']
 
-
     def checkCondition(self, strng):
         if strng == 'R' or strng == '':
             return True
@@ -59,6 +58,14 @@ class adventureGame:
 
         return l
 
+    def runCode(self, strng):
+    #TODO
+        stmt = #find and repalce all a::b things with self.state[a][b]
+        try:
+            ret = eval(stmt)
+        except:
+            ret = false
+        return ret
 
     def getVar(self, name):
         if name.isdigit():
