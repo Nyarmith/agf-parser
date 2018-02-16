@@ -58,9 +58,12 @@ class adventureGame:
 
         return l
 
+    def substPythonString(expr):
+        cd = r'[a-zA-Z]+::[a-zA-Z]'
+
     def runCode(self, strng):
     #TODO
-        stmt = #find and repalce all a::b things with self.state[a][b]
+        stmt = substPythonString(strng)
         try:
             ret = eval(stmt)
         except:
