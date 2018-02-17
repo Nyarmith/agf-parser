@@ -4,6 +4,7 @@ import re  #regexp
 
 #to use for parsing stuff
 xml_regex = "(?i)<\/?\w+((\s+\w+(\s*=\s*(?:\".*?\"|'.*?'|[^'\">\s]+))?)+\s*|\s*)\/?>"
+subst_vars = [r'^(\w+)::(\w+)$',r'self.states[\1][\2]']
 
 class adventureGame:
     def __init__(self):
@@ -43,44 +44,14 @@ class adventureGame:
     def isWin(self):
         return self.pos in self.data['states']['win_states']
 
-    def checkCondition(self, strng):
-        if strng == 'R' or strng == '':
-            return True
-
-        conds = strng.split('&&')
-        ret = True
-        for c in conds:
-            expr = c.split(' ')
-            left  =  getVar(expr[0])
-            mid   =  expr[1]
-            right =  getVar(expr[2])
-            ret = ret and eval(str(left)+mid+str(right))
-
-        return l
-
-    def substPythonString(expr):
-        cd = r'[a-zA-Z]+::[a-zA-Z]'
-
-    def runCode(self, strng):
-    #TODO
-        stmt = substPythonString(strng)
+    def evaluateStrExpression(self, expr):
         try:
-            ret = eval(stmt)
+            eval(substPythonString(expr))
         except:
-            ret = false
-        return ret
+            return 0;
 
-    def getVar(self, name):
-        if name.isdigit():
-            return name.isdigit()
-
-        namespace,var = name.split('::')
-        try:
-            ret = self.states[namespace][var]
-        except:
-            ret = 0
-        return ret
-
+    def substPythonString(self, expr):
+        return re.sub(subst_vars[0], subst_vars[1], expr)
 
     def setVar(self, name, val):
         namespace,var = name.split('::')
