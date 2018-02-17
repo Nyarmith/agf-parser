@@ -10,25 +10,20 @@ if __name__ == '__main__':
         usage()
         sys.exit(0)
 
-    game = ap.loadAGF(sys.argv[1])
+    game = ap.loadAGF(sys.argv[2])
 
     while (not game.isEnd()):
         print(game.state())
         print("--------\n")
-        choices = game.getChoices()
+        choices = ap.choices()
         for ch in choices:
-            print( ch )
+            print( choices )
         c = -1
-        while  c <= 0 or c>len(choices):
-            try:
-                c = int(input("Choose an option [1-{}]: ".format(len(choices))))
-            except:
-                print("please enter an integer ")
+        while ( c <=0 and c>len(c) ):
+            c = read("Choose an option [1-{}]: ".format(len(c)))
 
         game.choose(c - 1)
         print("vvvvvvvv")
-
-    print(game.state())
 
     print("^^^^^^^^\n")
     if ( game.isWin() ):
