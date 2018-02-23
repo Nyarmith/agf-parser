@@ -18,4 +18,5 @@ setup(
         packages     = ['agf_parser'],
         install_requires=['yaml'],
         scripts=['bin/play']
+        #entry_points --> use this to add entry-point cli thing to end-user
      )
