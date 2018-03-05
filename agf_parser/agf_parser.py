@@ -3,11 +3,19 @@ import json
 import re
 from lxml import etree
 
-#to use for parsing stuff
-subst_vars = [r'(\w+)::(\w+)',r'self.states["\1"]["\2"]']
+#to use for regex parsing stuff
+subst_vars  = [r'(\w+)::(\w+)',r'self.states["\1"]["\2"]']
 misc_substs = [r'true',r'True']
 
+"""
+This module lets you import and query adenture-game-format files as documented here https://docs.google.com/document/d/1ZAJcbe_a729lz6I1N9DyvFBcn74Mggtkr1RtJAPfS-Q/edit?usp=sharing
+"""
+
+
 class adventureGame:
+    """
+    This class holds the adventure game json object and allows you to navigate throughit, holding data to maintain the state of the game.
+    """
     def __init__(self):
         self.states  = {}    #save game-related states
         self.data    = None  #the description of the game
@@ -16,6 +24,9 @@ class adventureGame:
         self.text    = ''    #current text after processing
 
     def start(self):
+        """
+        Method must be called when starting a game
+        """
         self.pos = self.data['start_state']
         start_node = self.data['states'][self.pos]
         self.pruneChoices(start_node)
@@ -23,6 +34,9 @@ class adventureGame:
         self.states = self.data['gamevars']
 
     def choose(self, c):
+        """
+        Pass the integer c to pick from the list of valid choices
+        """
         #translate choice c to og choices
         c = self.choices[c][0]
         c = self.data['states'][self.pos]['options'][c]
@@ -40,13 +54,24 @@ class adventureGame:
         self.pos = pos               # finally, set our position string
 
     def state(self):
-        #show current state, return current state text
+        """
+        returns current state text
+        """
         return self.text
 
     def getChoices(self):
+        """
+        returns an ordered list of strings describing the current player choices
+        """
         return [c[-1] for c in self.choices]
 
     def pruneChoices(self, node):
+        """
+        given a node, filers the valid choices a player can make and stored them
+        internally
+        
+        you can get later get these choice with method getChoices()
+        """
         ch = node['options']
         self.choices = []
         for i in range(0,len(ch)):
@@ -56,6 +81,13 @@ class adventureGame:
                 self.choices.append([i,flavorText])
 
     def processText(self,node):
+        """
+        given a node, uses the current state of the game to parse any
+        conditions or xml tags in the node description and produce the
+        final string that the user will see
+
+        you can get the result of this method with method state()
+        """
         #parse string to display
         #n = self.data['states'][node] #im now passing this directly
         text = '<base>' + node['text'] + '</base>'
@@ -63,6 +95,10 @@ class adventureGame:
         self.text = self.parseXML(root)
 
     def parseXML(self, root):
+        """
+        given an xml node in the current game's state-text, compose a string
+        from its contents and all valid subnodes and return it
+        """
         strng = ''
         strng += root.text
         for i in root.getchildren():  #this is where we define the tag types, could use dict for switch/case logic here
@@ -72,33 +108,53 @@ class adventureGame:
         return strng
 
     def isEnd(self):
+        """
+        test if the current node is an end-state
+        (i.e. if it has no connections to other nodes)
+        """
         if (len(self.data['states'][self.pos]['options']) == 0):
             return True
         else:
             return False
 
     def isWin(self):
+        """
+        test if the current node is a win-state
+        """
         return self.pos in self.data['win_states']
 
     def execStmt(self, expr):
-        try:
+        """
+        execute the given state-modification string
+        """
+        try:  #just turning it into a valid python expression
             exec(self.substPythonString(expr))
         except:
             return False;
 
     def evalStmt(self, expr):
+        """
+        return the value of a state expression
+        """
         try:
             return eval(self.substPythonString(expr))
         except:
             return 0;
 
     def substPythonString(self, expr):
+        """
+        turns the game's syntax into a valid python expression
+        """
+        #this is really exploitable without additional checks
         expr = re.sub(subst_vars[0], subst_vars[1], expr)
         expr = re.sub(misc_substs[0], misc_substs[1], expr)
         return expr
 
 
 def parseAGF(s):
+    """
+    turn a valid adventure-game-format string into an AdventureGame object
+    """
     #turn string s into AGF
     ag = adventureGame()
     ag.data = json.loads(s)
@@ -106,16 +162,25 @@ def parseAGF(s):
     return ag
 
 def serialize(ag):
+    """
+    turn an AdventureGame object into an equivalent string
+    """
     #turn adventureGame object into string
     return json.dumps(ag.data)
 
 #load a .agf file
 def loadAGF(f):
+    """
+    load AdventureGame from file
+    """
     with open(f) as fd:
         ag = parseAGF(fd.read())
     return ag
 
 def saveAGF(ag, fn):
+    """
+    save AdventureGame object to file
+    """
     with open(fn,'w') as fd:
         fd.write(serialize(ag))
 
