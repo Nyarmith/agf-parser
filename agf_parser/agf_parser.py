@@ -8,7 +8,7 @@ subst_vars  = [r'(\w+)::(\w+)',r'self.states["\1"]["\2"]']
 misc_substs = [r'true',r'True']
 
 """
-This module lets you import and query adenture-game-format files as documented here https://docs.google.com/document/d/1ZAJcbe_a729lz6I1N9DyvFBcn74Mggtkr1RtJAPfS-Q/edit?usp=sharing
+This module lets you import and query adventure-game-format files as documented here https://docs.google.com/document/d/1ZAJcbe_a729lz6I1N9DyvFBcn74Mggtkr1RtJAPfS-Q/edit?usp=sharing
 """
 
 
@@ -17,6 +17,7 @@ class adventureGame:
     This class holds the adventure game json object and allows you to navigate throughit, holding data to maintain the state of the game.
     """
     def __init__(self):
+        self.title   = None  #given title of adventure
         self.states  = {}    #save game-related states
         self.data    = None  #the description of the game
         self.pos     = None  #ptr to current place in game
@@ -27,6 +28,7 @@ class adventureGame:
         """
         Method must be called when starting a game
         """
+        self.title = self.data['title']
         self.pos = self.data['start_state']
         start_node = self.data['states'][self.pos]
         self.pruneChoices(start_node)
@@ -52,7 +54,13 @@ class adventureGame:
         self.pruneChoices(nextNode)  # prune the choices the user can pick
         self.processText(nextNode)   # process text based on env states
         self.pos = pos               # finally, set our position string
-
+    
+    def adventureTitle(self):
+        """
+        returns adventure's given name
+        """
+        return self.title
+    
     def state(self):
         """
         returns current state text
@@ -130,7 +138,7 @@ class adventureGame:
         try:  #just turning it into a valid python expression
             exec(self.substPythonString(expr))
         except:
-            return False;
+            return False
 
     def evalStmt(self, expr):
         """
@@ -139,7 +147,7 @@ class adventureGame:
         try:
             return eval(self.substPythonString(expr))
         except:
-            return 0;
+            return 0
 
     def substPythonString(self, expr):
         """
