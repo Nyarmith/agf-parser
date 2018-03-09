@@ -29,11 +29,12 @@ class adventureGame:
         Method must be called when starting a game
         """
         self.title = self.data['title']
+        self.states = self.data['gamevars']
         self.pos = self.data['start_state']
         start_node = self.data['states'][self.pos]
         self.pruneChoices(start_node)
         self.processText(start_node)
-        self.states = self.data['gamevars']
+
 
     def choose(self, c):
         """
