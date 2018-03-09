@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
         name         = "agf_parser",
-        version      = "0.0.2",
+        version      = "0.0.3",
         author       = "Sergey Ivanov",
         author_email = "powah.serge@gmail.com",
         description  = "Parses .agf files and makes a game object",
