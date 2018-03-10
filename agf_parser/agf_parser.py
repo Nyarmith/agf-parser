@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import re
+import random
 from lxml import etree
 
 #to use for regex parsing stuff
@@ -43,10 +44,14 @@ class adventureGame:
         #translate choice c to og choices
         c = self.choices[c][0]
         c = self.data['states'][self.pos]['options'][c]
-        #TODO: Implement random transition check&choice here
 
-        #input choice c and progress game
-        pos = c[-2] #nextNode(string)
+        #random transition are marked by the transition option being a list of options
+        if isinstance(c[-2], list):
+            pos = random.choice(c[-2])
+        else:
+            pos = c[-2] 
+        #pos is a string of the nextNode
+
         nextNode = self.data['states'][pos]        #nextNode(var)
         #get parts of the node
 
