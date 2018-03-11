@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import re
+import random
 from lxml import etree
 
 #to use for regex parsing stuff
@@ -43,10 +44,14 @@ class adventureGame:
         #translate choice c to og choices
         c = self.choices[c][0]
         c = self.data['states'][self.pos]['options'][c]
-        #TODO: Implement random transition check&choice here
 
-        #input choice c and progress game
-        pos = c[-2] #nextNode(string)
+        #random transition are marked by the transition option not being just string but objects of options
+        if not isinstance(c[-2], str):
+            pos = self.randomChoose(c[-2])
+        else:
+            pos = c[-2] 
+        #pos is a string of the nextNode
+
         nextNode = self.data['states'][pos]        #nextNode(var)
         #get parts of the node
 
@@ -56,6 +61,17 @@ class adventureGame:
         self.processText(nextNode)   # process text based on env states
         self.pos = pos               # finally, set our position string
     
+    def randomChoose(self, weightedList):
+        """
+        returns a random key from a weighted dic entries being the weights 
+        """
+        longWeightedList = []
+        for i in weightedList:
+            for n in range(weightedList[i]): 
+                longWeightedList.append(str(i))
+        pos = random.choice(longWeightedList)
+        return pos
+
     def adventureTitle(self):
         """
         returns adventure's given name
