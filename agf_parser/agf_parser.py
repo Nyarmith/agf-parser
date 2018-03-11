@@ -45,9 +45,9 @@ class adventureGame:
         c = self.choices[c][0]
         c = self.data['states'][self.pos]['options'][c]
 
-        #random transition are marked by the transition option being a list of options
-        if isinstance(c[-2], list):
-            pos = random.choice(c[-2])
+        #random transition are marked by the transition option not being just string but objects of options
+        if not isinstance(c[-2], str):
+            pos = self.randomChoose(c[-2])
         else:
             pos = c[-2] 
         #pos is a string of the nextNode
@@ -61,6 +61,17 @@ class adventureGame:
         self.processText(nextNode)   # process text based on env states
         self.pos = pos               # finally, set our position string
     
+    def randomChoose(self, weightedList):
+        """
+        returns a random key from a weighted dic entries being the weights 
+        """
+        longWeightedList = []
+        for i in weightedList:
+            for n in range(weightedList[i]): 
+                longWeightedList.append(str(i))
+        pos = random.choice(longWeightedList)
+        return pos
+
     def adventureTitle(self):
         """
         returns adventure's given name
